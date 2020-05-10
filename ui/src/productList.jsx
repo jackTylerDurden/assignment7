@@ -11,7 +11,7 @@ import { Label,Panel,Modal,Button,Tooltip,OverlayTrigger,Glyphicon } from 'react
 export default class ProductList extends React.Component {
   constructor() {
     super();
-    this.state = { products: [],showModal : false};
+    this.state = { products: [],showModal : false,count:0};
     this.addProduct = this.addProduct.bind(this);
     this.deleteProduct = this.deleteProduct.bind(this);
     this.handleShowModal = this.handleShowModal.bind(this);
@@ -19,7 +19,7 @@ export default class ProductList extends React.Component {
   }
 
   componentDidMount() {
-    this.loadData();
+    this.loadData();    
   }
 
   async loadData() {
@@ -35,6 +35,29 @@ export default class ProductList extends React.Component {
     });
     const responseResult = await response.json();
     this.setState({ products: responseResult.data.productList });
+    this.getCount();
+  }
+
+  async getCount(){
+    const query = `query{
+      availableProductCount{
+        count
+      }
+    }`;
+
+    const response = await fetch(window.env.UI_API_ENDPOINT,{
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({query}),      
+    });
+
+    const result = await response.json();
+    console.log("count result----->>>",result);
+    if(result.data.availableProductCount.length > 0){
+      this.setState({count:result.data.availableProductCount[0].count});
+    }else{
+      this.setState({count:0});
+    }
   }
 
   async addProduct(newProduct) {
@@ -89,7 +112,7 @@ export default class ProductList extends React.Component {
     return (
       <React.Fragment>
         <h1><Label>My Company Inventory</Label></h1>
-        <h3>Showing all available products</h3>
+        <h3>Showing {this.state.count} available products</h3>
         <hr />
         <ProductTable deleteProduct={this.deleteProduct} products={this.state.products} />
         <hr />

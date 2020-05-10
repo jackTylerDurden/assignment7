@@ -9,6 +9,7 @@ const resolvers = {
   Query: {
     productList: product.productList,
     product: product.getProduct,
+    availableProductCount:product.getCount
   },
   Mutation: {
     productAdd: product.productAdd,

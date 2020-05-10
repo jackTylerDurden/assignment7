@@ -42,10 +42,17 @@ async function remove(_, { id }) {
     return false;
   }
 
+async function getCount(){
+  const db = getDb();
+  const results = await db.collection('products').aggregate([{$group:{_id:null,count:{$sum:1}}}]).toArray();
+  console.log("results---->>",results);
+  return results;
+}
 module.exports = {
     productList,
     productAdd,
     getProduct,
     productUpdate,
-    remove   
+    remove,
+    getCount,   
   };
